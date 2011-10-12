@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from itertools import chain
-
 
 class Options(dict):
     
