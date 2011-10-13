@@ -11,13 +11,14 @@ class Options(dict):
             return dict.__getitem__(self, key)
 
     def __iter__(self):
-        return self.iteritems()
-
-    def iteritems(self):
         for option, value in self.items():
             yield option
             if value:
                 yield value
+
+    def iteritems(self):
+        for option, value in self.items():
+            yield (option, value)
 
     def __repr__(self):
         return "<{cls} {opts}>".format(opts=list(self),
@@ -58,9 +59,14 @@ class CombinedOptions(object):
         return self._list
 
     def __iter__(self):
-        for item in self._list:
-            for option in item:
-                yield option
+        for option in self._list:
+            for item in option:
+                yield item
+
+    def iteritems(self):
+        for option in self._list:
+            for item in option.iteritems():
+                yield item
 
     def __repr__(self):
         return "<{cls} {opts}>".format(opts=list(self),

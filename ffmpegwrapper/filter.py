@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
 
-from itertools import chain, islice
+from itertools import chain
 
 from .options import CombinedOptions
 
@@ -11,12 +11,8 @@ class CombinedFilter(CombinedOptions):
         return ",".join(CombinedFilter.__iter__(self))
 
     def __iter__(self):
-        i = CombinedOptions.__iter__
-        keys = islice(i(self), 0, None, 2)
-        values = islice(i(self), 1, None, 2)
-        
-        for key, value in zip(keys, values):
-            if value:
+        for key, value in CombinedOptions.iteritems(self):
+            if value is not None:
                 yield "=".join([key, str(value)])            
             else:
                 yield key
@@ -73,8 +69,8 @@ class VideoFilter(CombinedFilter):
         self.add_option('format', filter)
         return self
 
-    def freior(self, name, **kwargs):
-        filter = self._format_keyword_parameter(name, **kwargs)
+    def freior(self, name, *args):
+        filter = self._format_parameter(name, *args)
         self.add_option('frei0r', filter)
         return self
 
@@ -87,7 +83,8 @@ class VideoFilter(CombinedFilter):
         self.add_option('hflip', None)
         return self
 
-    def hqdn3d(self, luma_sp='', chroma_sp='', luma_tmp='', chroma_tmp=''):
+    def hqdn3d(self, luma_sp=None, chroma_sp=None,
+               luma_tmp=None, chroma_tmp=None):
         filter = self._format_parameter(
             luma_sp, chroma_sp, luma_tmp, chroma_tmp)
         self.add_option('hqdn3d', filter)
@@ -130,25 +127,18 @@ class VideoFilter(CombinedFilter):
         self.add_option('select', expression)
         return self
 
-    def setdar(self, aspect):
-        self.add_option('setdar', aspect)
+    def setdar(self, x, y):
+        filter = self._format_parameter(x, y)
+        self.add_option('setdar', filter)
         return self
 
     def setpts(self, expression):
         self.add_option('setpts', expression)
         return self
 
-    def setsar(self, aspect):
-        self.add_option('setsar', aspect)
-        return self
-
-    def settb(self, expression):
-        self.add_option('settb', expression)
-        return self
-
-    def showinfo(self, **kwargs):
-        filter = self._format_keyword_parameter(**kwargs)
-        self.add_option('showinfo', filter)
+    def setsar(self, x, y):
+        filter = self._format_parameter(x, y)
+        self.add_option('setsar', filter)
         return self
 
     def slicify(self, height=16):
@@ -177,13 +167,17 @@ class VideoFilter(CombinedFilter):
 
     def _format_keyword_parameter(self, **kwargs):
         parameter_list = []
-        for key, value in kwargs:
+        print(kwargs)
+        for key, value in kwargs.items():
             try:
-                parameter_list.append("=".join([key, value]))
+                if not value:
+                    parameter_list.append(key)
+                else:
+                    parameter_list.append("=".join([key, value]))
             except TypeError:
-                values = ":".join(value)
+                values = ':'.join(kwargs[key])
                 parameter_list.append("=".join([key, values]))
-        return ":".join(parameter_list)
+        return '"' + ':'.join(parameter_list) + '"'
 
     def __iter__(self):
         return chain(['-vf', CombinedFilter.__str__(self)])
