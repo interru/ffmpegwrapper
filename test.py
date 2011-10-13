@@ -194,6 +194,11 @@ class VideoFilterTestCase(unittest.TestCase):
         self.assertEqual(list(self.filter),
             self.prefix('transpose=2'))
 
+    def test_unsharp(self):
+        self.filter.unsharp(1, 2, 3, 4, 5, 6)
+        self.assertEqual(list(self.filter),
+            self.prefix('unsharp=1:2:3:4:5:6'))
+
     def test_vflip(self):
         self.filter.vflip()
         self.assertEqual(list(self.filter),
