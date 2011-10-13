@@ -153,6 +153,14 @@ class VideoFilter(CombinedFilter):
         self.add_option('transpose', type)
         return self
 
+    def unsharp(self, *args):
+        if len(args) > 6:
+            message = 'unsharp() takes exactly 6 positional arguments'
+            raise TypeError(message)
+        filter = self._format_parameter(*args)
+        self.add_option('unsharp', filter)
+        return self
+        
     def vflip(self):
         self.add_option('vflip', None)
         return self
