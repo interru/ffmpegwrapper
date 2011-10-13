@@ -67,6 +67,24 @@ class CombinedOptions(object):
         for option in self._list:
             for item in option.iteritems():
                 yield item
+    
+    def _format_parameter(self, *args):
+        parameter = filter(lambda x: x is not None, args)
+        return ':'.join(map(str, parameter))
+
+    def _format_keyword_parameter(self, **kwargs):
+        parameter_list = []
+        print(kwargs)
+        for key, value in kwargs.items():
+            try:
+                if not value:
+                    parameter_list.append(key)
+                else:
+                    parameter_list.append("=".join([key, value]))
+            except TypeError:
+                values = ':'.join(kwargs[key])
+                parameter_list.append("=".join([key, values]))
+        return '"' + ':'.join(parameter_list) + '"'
 
     def __repr__(self):
         return "<{cls} {opts}>".format(opts=list(self),

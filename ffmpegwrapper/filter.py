@@ -17,6 +17,7 @@ class CombinedFilter(CombinedOptions):
             else:
                 yield key
 
+
 class VideoFilter(CombinedFilter):
 
     def blackframe(self, amount, threshold):
@@ -161,29 +162,15 @@ class VideoFilter(CombinedFilter):
         self.add_option('yadif', filter)
         return self
 
-    def _format_parameter(self, *args):
-        parameter = filter(lambda x: x is not None, args)
-        return ':'.join(map(str, parameter))
-
-    def _format_keyword_parameter(self, **kwargs):
-        parameter_list = []
-        print(kwargs)
-        for key, value in kwargs.items():
-            try:
-                if not value:
-                    parameter_list.append(key)
-                else:
-                    parameter_list.append("=".join([key, value]))
-            except TypeError:
-                values = ':'.join(kwargs[key])
-                parameter_list.append("=".join([key, values]))
-        return '"' + ':'.join(parameter_list) + '"'
-
     def __iter__(self):
         return chain(['-vf', CombinedFilter.__str__(self)])
 
 
 class AudioFilter(CombinedFilter):
+
+    def null(self):
+        self.add_option('null', None)
+        return self
 
     def __iter__(self):
         return chain(['-af', CombinedFilter.__str__(self)])
