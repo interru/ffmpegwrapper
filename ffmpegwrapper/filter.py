@@ -13,7 +13,7 @@ class CombinedFilter(CombinedOptions):
     def __iter__(self):
         for key, value in CombinedOptions.iteritems(self):
             if value is not None:
-                yield "=".join([key, str(value)])            
+                yield "=".join([key, str(value)])
             else:
                 yield key
 
@@ -160,7 +160,7 @@ class VideoFilter(CombinedFilter):
         filter = self._format_parameter(*args)
         self.add_option('unsharp', filter)
         return self
-        
+
     def vflip(self):
         self.add_option('vflip', None)
         return self

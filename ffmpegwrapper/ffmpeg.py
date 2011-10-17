@@ -8,14 +8,19 @@
     :license: BSD, see LICENSE for more details.
 """
 
-from subprocess import Popen, PIPE
+
+import os
+
+from fcntl import fcntl, F_SETFL, F_GETFL
+from select import select
+from subprocess import Popen, PIPE, STDOUT
 from itertools import chain
 
 from .options import CombinedOptions, Options
-        
+
 
 class Input(CombinedOptions):
-    
+
     def __init__(self, file, *args):
         self.file = file
         CombinedOptions.__init__(self, *args)
@@ -25,10 +30,14 @@ class Input(CombinedOptions):
 
 
 class Output(CombinedOptions):
-    
+
     def __init__(self, file, *args):
         self.file = file
         CombinedOptions.__init__(self, *args)
+
+    def overwrite(self):
+        self.add_option('-y', None)
+        return self
 
     def __iter__(self):
         return chain(CombinedOptions.__iter__(self), [self.file])
@@ -41,8 +50,17 @@ class FFmpeg(CombinedOptions):
         CombinedOptions.__init__(self, *args)
 
     def run(self):
-        return Popen(self, executable=self.binary, stdin=PIPE,
-            stdout=PIPE, stderr=PIPE)
+        self.pipe = Popen(self, executable=self.binary,
+                     stderr=PIPE)
+        fcntl(self.pipe.stderr.fileno(), F_SETFL,
+              fcntl(self.pipe.stderr.fileno(), F_GETFL) | os.O_NONBLOCK)
+        return self
+
+    def wait_for_data(self):
+        while True:
+            ready = select([self.pipe.stderr.fileno()], [], [])[0]
+            if ready:
+                return True
 
     def add_option(self, key, value):
         self._list.insert(0, Options({key: value}))

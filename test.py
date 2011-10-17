@@ -2,9 +2,8 @@
 
 import unittest
 
-from ffmpegwrapper import FFmpeg, Input, Output
-from ffmpegwrapper.codec import VideoCodec, AudioCodec
-from ffmpegwrapper.filter import VideoFilter
+from ffmpegwrapper import FFmpeg, Input, Output, \
+    VideoCodec, AudioCodec, VideoFilter
 from ffmpegwrapper.options import Options
 
 
@@ -46,12 +45,11 @@ class FFmpegTestCase(unittest.TestCase):
     def test_filter_interface(self):
         filter = VideoFilter()
         filter.blackframe(1, 2).crop(792)
-        self.assertEqual(list(filter), ['-vf',
-            'blackframe=1:2,crop=792'])
+        self.assertEqual(list(filter), ['-vf', 'blackframe=1:2,crop=792'])
 
         output = Output('/new', filter)
-        self.assertEqual(list(output), ['-vf',
-            'blackframe=1:2,crop=792', '/new'])
+        self.assertEqual(
+            list(output), ['-vf', 'blackframe=1:2,crop=792', '/new'])
 
     def test_ffmpeg_interface(self):
         input = Input('/old')
@@ -208,6 +206,114 @@ class VideoFilterTestCase(unittest.TestCase):
         self.filter.yadif()
         self.assertEqual(list(self.filter),
             self.prefix('yadif=0:-1'))
+
+
+class VideoCodecTestCase(unittest.TestCase):
+
+    def setUp(self):
+        self.codec = VideoCodec('libx264')
+
+    def prefix(self, *args):
+        return ['-vcodec', 'libx264'] + list(args)
+
+    def test_bitrate(self):
+        self.codec.bitrate('300k')
+        self.assertEqual(list(self.codec),
+            self.prefix('-b', '300k'))
+
+    def test_frames(self):
+        self.codec.frames(100)
+        self.assertEqual(list(self.codec),
+            self.prefix('-vframes', '100'))
+
+    def test_fps(self):
+        self.codec.fps(24)
+        self.assertEqual(list(self.codec),
+            self.prefix('-r', '24'))
+
+    def test_aspect(self):
+        self.codec.aspect(16, 9)
+        self.assertEqual(list(self.codec),
+            self.prefix('-aspect', '16:9'))
+
+    def test_bitrate_tolerance(self):
+        self.codec.bitrate_tolerance(10)
+        self.assertEqual(list(self.codec),
+            self.prefix('-bt', '10'))
+
+    def test_max_bitrate(self):
+        self.codec.max_bitrate('100k')
+        self.assertEqual(list(self.codec),
+            self.prefix('-maxrate', '100k'))
+
+    def test_min_bitrate(self):
+        self.codec.min_bitrate('50k')
+        self.assertEqual(list(self.codec),
+            self.prefix('-minrate', '50k'))
+
+    def test_buffer_size(self):
+        self.codec.buffer_size('20k')
+        self.assertEqual(list(self.codec),
+            self.prefix('-bufsize', '20k'))
+
+    def test_pass_number(self):
+        self.codec.pass_number(2)
+        self.assertEqual(list(self.codec),
+            self.prefix('-pass', '2'))
+
+    def test_language(self):
+        self.codec.language('DEU')
+        self.assertEqual(list(self.codec),
+            self.prefix('-vlang', 'DEU'))
+
+    def test_same_quality(self):
+        self.codec.same_quality()
+        self.assertEqual(list(self.codec),
+            self.prefix('-sameq'))
+
+    def test_preset(self):
+        self.codec.preset('max')
+        self.assertEqual(list(self.codec),
+            self.prefix('-vpre', 'max'))
+
+
+class AudioTestCase(unittest.TestCase):
+
+    def setUp(self):
+        self.codec = AudioCodec('AC3')
+
+    def prefix(self, *args):
+        return ['-acodec', 'AC3'] + list(args)
+
+    def test_frames(self):
+        self.codec.frames(100)
+        self.assertEqual(list(self.codec),
+            self.prefix('-aframes', '100'))
+
+    def test_frequence(self):
+        self.codec.frequence(48000)
+        self.assertEqual(list(self.codec),
+            self.prefix('-ar', '48000'))
+
+    def test_bitrate(self):
+        self.codec.bitrate('320k')
+        self.assertEqual(list(self.codec),
+            self.prefix('-ab', '320k'))
+
+    def test_quality(self):
+        self.codec.quality(8)
+        self.assertEqual(list(self.codec),
+            self.prefix('-aq', '8'))
+
+    def test_language(self):
+        self.codec.language('DEU')
+        self.assertEqual(list(self.codec),
+            self.prefix('-alang', 'DEU'))
+
+    def test_preset(self):
+        self.codec.preset('max')
+        self.assertEqual(list(self.codec),
+            self.prefix('-apre', 'max'))
 
 
 if __name__ == '__main__':

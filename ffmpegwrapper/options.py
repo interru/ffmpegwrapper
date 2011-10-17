@@ -2,7 +2,7 @@
 
 
 class Options(dict):
-    
+
     def __init__(self, *args, **kwargs):
         dict.__init__(self, *args, **kwargs)
 
@@ -35,7 +35,7 @@ class CombinedOptions(object):
 
     def append(self, item):
         self._list.append(item)
-    
+
     def insert(self, item):
         self._list.insert(item)
 
@@ -67,7 +67,7 @@ class CombinedOptions(object):
         for option in self._list:
             for item in option.iteritems():
                 yield item
-    
+
     def _format_parameter(self, *args):
         parameter = filter(lambda x: x is not None, args)
         return ':'.join(map(str, parameter))
