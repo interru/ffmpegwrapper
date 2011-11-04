@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
-class Options(dict):
+class Option(dict):
 
     def __init__(self, *args, **kwargs):
         dict.__init__(self, *args, **kwargs)
@@ -25,7 +25,7 @@ class Options(dict):
             cls=self.__class__.__name__)
 
 
-class CombinedOptions(object):
+class OptionStore(object):
 
     def __init__(self, *args):
         self._list = list(args)
@@ -52,7 +52,7 @@ class CombinedOptions(object):
         return self._list.index(item)
 
     def add_option(self, key, value):
-        self._list.append(Options({key: value}))
+        self._list.append(Option({key: value}))
 
     @property
     def option_containers(self):

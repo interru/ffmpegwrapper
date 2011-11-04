@@ -2,23 +2,23 @@
 
 from itertools import chain
 
-from .options import CombinedOptions
+from .options import OptionStore
 
 
-class CombinedFilter(CombinedOptions):
+class FilterStore(OptionStore):
 
     def __str__(self):
-        return ",".join(CombinedFilter.__iter__(self))
+        return ",".join(FilterStore.__iter__(self))
 
     def __iter__(self):
-        for key, value in CombinedOptions.iteritems(self):
+        for key, value in OptionStore.iteritems(self):
             if value is not None:
                 yield "=".join([key, str(value)])
             else:
                 yield key
 
 
-class VideoFilter(CombinedFilter):
+class VideoFilter(FilterStore):
 
     def blackframe(self, amount, threshold):
         filter = self._format_parameter(amount, threshold)
@@ -171,14 +171,14 @@ class VideoFilter(CombinedFilter):
         return self
 
     def __iter__(self):
-        return chain(['-vf', CombinedFilter.__str__(self)])
+        return chain(['-vf', FilterStore.__str__(self)])
 
 
-class AudioFilter(CombinedFilter):
+class AudioFilter(FilterStore):
 
     def null(self):
         self.add_option('null', None)
         return self
 
     def __iter__(self):
-        return chain(['-af', CombinedFilter.__str__(self)])
+        return chain(['-af', FilterStore.__str__(self)])

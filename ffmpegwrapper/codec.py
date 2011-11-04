@@ -2,18 +2,18 @@
 
 from itertools import chain
 
-from .options import CombinedOptions
+from .options import OptionStore
 
 
 NO_AUDIO = ['-an']
 NO_VIDEO = ['-vn']
 
 
-class Codec(CombinedOptions):
+class Codec(OptionStore):
 
     def __init__(self, name, *args):
         self.name = name
-        CombinedOptions.__init__(self, *args)
+        OptionStore.__init__(self, *args)
 
 
 class VideoCodec(Codec):

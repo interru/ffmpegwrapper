@@ -16,38 +16,39 @@ from select import select
 from subprocess import Popen, PIPE, STDOUT
 from itertools import chain
 
-from .options import CombinedOptions, Options
+from .options import OptionStore, Option
 
 
-class Input(CombinedOptions):
+class Input(OptionStore):
 
     def __init__(self, file, *args):
         self.file = file
-        CombinedOptions.__init__(self, *args)
+        OptionStore.__init__(self, *args)
 
     def __iter__(self):
-        return chain(CombinedOptions.__iter__(self), ['-i', self.file])
+        return chain(OptionStore.__iter__(self), ['-i', self.file])
 
+class Output(OptionStore):
 
-class Output(CombinedOptions):
 
     def __init__(self, file, *args):
         self.file = file
-        CombinedOptions.__init__(self, *args)
+        OptionStore.__init__(self, *args)
 
     def overwrite(self):
         self.add_option('-y', None)
         return self
 
     def __iter__(self):
-        return chain(CombinedOptions.__iter__(self), [self.file])
+        return chain(OptionStore.__iter__(self), [self.file])
 
 
-class FFmpeg(CombinedOptions):
+class FFmpeg(OptionStore):
+
 
     def __init__(self, binary="ffmpeg", *args):
         self.binary = binary
-        CombinedOptions.__init__(self, *args)
+        OptionStore.__init__(self, *args)
 
     def run(self):
         self.pipe = Popen(self, executable=self.binary,

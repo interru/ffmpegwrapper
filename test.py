@@ -4,7 +4,7 @@ import unittest
 
 from ffmpegwrapper import FFmpeg, Input, Output, \
     VideoCodec, AudioCodec, VideoFilter
-from ffmpegwrapper.options import Options
+from ffmpegwrapper.options import Option
 
 
 class FFmpegTestCase(unittest.TestCase):
@@ -14,7 +14,7 @@ class FFmpegTestCase(unittest.TestCase):
         self.assertEqual(list(input), ['-i', '/old'])
         self.assertEqual(input.file, '/old')
 
-        option = Options({'-vf': 'x11grab'})
+        option = Option({'-vf': 'x11grab'})
         input.append(option)
         self.assertEqual(list(input), ['-vf', 'x11grab', '-i', '/old'])
         self.assertEqual(input.pop(), option)
@@ -27,7 +27,7 @@ class FFmpegTestCase(unittest.TestCase):
         self.assertEqual(list(output), ['/new'])
         self.assertEqual(output.file, '/new')
 
-        option = Options({'-vcodec': 'libx264'})
+        option = Option({'-vcodec': 'libx264'})
         output.append(option)
         self.assertEqual(list(output), ['-vcodec', 'libx264', '/new'])
         self.assertEqual(output.pop(), option)
