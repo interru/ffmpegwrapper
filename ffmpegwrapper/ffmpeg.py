@@ -51,17 +51,34 @@ class FFmpeg(OptionStore):
         OptionStore.__init__(self, *args)
 
     def run(self):
-        self.pipe = Popen(self, executable=self.binary,
-                     stderr=PIPE)
+        """Execute through subprocess the :attr:`binary` with all Options
+        that are appended in this Store as arguments.
+        """
+        self.pipe = Popen(list(self), stderr=PIPE)
         fcntl(self.pipe.stderr.fileno(), F_SETFL,
               fcntl(self.pipe.stderr.fileno(), F_GETFL) | os.O_NONBLOCK)
         return self
 
     def wait_for_data(self):
-        while True:
+        """ As long as the :attr:`binary` is executed through :meth:`run`
+        we process a syscall to check if ffmpeg has written to stderr. If
+        ffmpeg has written to stderr we return true. If the binary isn't
+        running any more we return False.
+
+        This is a helper class to deal with the unbuffered output from ffmpeg
+        """
+        while self.pipe.poll() is None:
             ready = select([self.pipe.stderr.fileno()], [], [])[0]
             if ready:
                 return True
+        return False
+
+    def poll(self):
+        """Check if :attr:`binary` is running"""
+        return self.pipe.poll()
 
     def add_option(self, key, value):
-        self._list.insert(0, Options({key: value}))
+        self._list.insert(0, Option({key: value}))
+
+    def __iter__(self):
+        return chain([self.binary], OptionStore.__iter__(self))
