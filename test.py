@@ -56,7 +56,7 @@ class FFmpegTestCase(unittest.TestCase):
         output = Output('/new')
 
         ffmpeg = FFmpeg('ffmpeg', input, output)
-        self.assertEqual(list(ffmpeg), ['-i', '/old', '/new'])
+        self.assertEqual(list(ffmpeg), ['ffmpeg', '-i', '/old', '/new'])
 
 
 class VideoFilterTestCase(unittest.TestCase):
