@@ -13,7 +13,7 @@ import os
 
 from fcntl import fcntl, F_SETFL, F_GETFL
 from select import select
-from subprocess import Popen, PIPE, STDOUT
+from subprocess import Popen, PIPE
 from itertools import chain
 
 from .options import OptionStore, Option
