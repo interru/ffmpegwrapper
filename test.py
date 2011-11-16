@@ -277,7 +277,7 @@ class VideoCodecTestCase(unittest.TestCase):
             self.prefix('-vpre', 'max'))
 
 
-class AudioTestCase(unittest.TestCase):
+class AudioCodecTestCase(unittest.TestCase):
 
     def setUp(self):
         self.codec = AudioCodec('AC3')
