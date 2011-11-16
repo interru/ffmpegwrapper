@@ -20,6 +20,11 @@ from .options import OptionStore, Option
 
 
 class Input(OptionStore):
+    """Store for a input file.
+
+    :param file: Path to the input file
+    :param args: A list of Stores that should be appended
+    """
 
     def __init__(self, file, *args):
         self.file = file
@@ -28,14 +33,20 @@ class Input(OptionStore):
     def __iter__(self):
         return chain(OptionStore.__iter__(self), ['-i', self.file])
 
-class Output(OptionStore):
 
+class Output(OptionStore):
+    """Store for a output file.
+
+    :param file: Path in which the file should be saved
+    :param args: A list of Stores that should be appended
+    """
 
     def __init__(self, file, *args):
         self.file = file
         OptionStore.__init__(self, *args)
 
     def overwrite(self):
+        """Overwrite the file if it already exist"""
         self.add_option('-y', None)
         return self
 
@@ -44,7 +55,16 @@ class Output(OptionStore):
 
 
 class FFmpeg(OptionStore):
+    """This class represent the FFmpeg command.
 
+    It behaves like a list. If you iterate over the class it will yield
+    small parts from the ffmpeg command with it arguments. The arguments
+    for the command are in the Option classes. They can be appended directly
+    or through one or more Stores.
+
+    :param binary: The binary subprocess should execute at the :meth:`run`
+    :param args: A list of Stores that should be appended
+    """
 
     def __init__(self, binary="ffmpeg", *args):
         self.binary = binary
