@@ -19,6 +19,16 @@ class FilterStore(OptionStore):
 
 
 class VideoFilter(FilterStore):
+    """FilterStore for Videofilters.
+
+    .. seealso::
+
+        `FFmpeg documentation, Videofilter`_
+            Documentation of all filters and which effect they have.
+
+    .. _FFmpeg documentation, Videofilter:
+        http://ffmpeg.org/ffmpeg.html#Video-Filters
+    """
 
     def blackframe(self, amount, threshold):
         filter = self._format_parameter(amount, threshold)
@@ -175,8 +185,19 @@ class VideoFilter(FilterStore):
 
 
 class AudioFilter(FilterStore):
+    """FilterStore for Audifilters.
+
+    .. seealso::
+
+        `FFmpeg documentation, Audiofilter`_
+            Documentation of all filters and which effect they have.
+
+    .. _FFmpeg documentation, Audiofilter:
+        http://ffmpeg.org/ffmpeg.html#Audio-Filters
+    """
 
     def null(self):
+        """does nothing"""
         self.add_option('null', None)
         return self
 

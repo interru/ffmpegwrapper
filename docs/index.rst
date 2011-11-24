@@ -48,18 +48,22 @@ Codecs
 
 .. autoclass:: VideoCodec
     :members:
+    :undoc-members:
 
 .. autoclass:: AudioCodec
     :members:
+    :undoc-members:
 
 Filters
 ~~~~~~~
 
 .. autoclass:: VideoFilter
     :members:
+    :undoc-members:
 
 .. autoclass:: AudioFilter
     :members:
+    :undoc-members:
 
 Stores and Options
 ~~~~~~~~~~~~~~~~~~

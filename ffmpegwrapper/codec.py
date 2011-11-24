@@ -17,6 +17,10 @@ class Codec(OptionStore):
 
 
 class VideoCodec(Codec):
+    """This represent an video codec.
+    
+    You can append this class to an :class:`Output` object to tell
+    which FFmpeg which codec you want."""
 
     def bitrate(self, bitrate):
         self.add_option('-b', str(bitrate))
@@ -77,6 +81,10 @@ class VideoCodec(Codec):
 
 
 class AudioCodec(Codec):
+    """This represent an audio codec.
+    
+    You can append this class to an :class:`Output` object to tell
+    which FFmpeg which codec you want."""
 
     def frames(self, number):
         self.add_option('-aframes', str(number))
@@ -103,10 +111,9 @@ class AudioCodec(Codec):
         return self
 
     def preset(self, preset):
+        """Load default presets from a preset file"""
         self.add_option('-apre', str(preset))
         return self
 
     def __iter__(self):
         return chain(['-acodec', self.name], Codec.__iter__(self))
-
-
