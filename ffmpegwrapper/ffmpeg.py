@@ -9,12 +9,14 @@
 """
 
 
-import os
-
-from fcntl import fcntl, F_SETFL, F_GETFL
-from select import select
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, STDOUT
 from itertools import chain
+from threading import Thread
+
+try:
+    from Queue import Queue, Empty
+except ImportError:
+    from queue import Queue, Empty
 
 from .options import OptionStore, Option
 
@@ -54,6 +56,55 @@ class Output(OptionStore):
         return chain(OptionStore.__iter__(self), [self.file])
 
 
+class FFmpegProcess(object):
+
+    def __init__(self, command):
+        self.command = list(command)
+        self.queue = Queue()
+        self.process = None
+
+    def _queue_output(self, out, queue):
+        line = ''
+        while self.process.poll() is None:
+            chunk = out.read(1).decode('utf-8')
+            if chunk == '':
+                continue
+            line += chunk
+            if chunk in ('\n', '\r'):
+                queue.put(line)
+                line = ''
+        out.close()
+
+    def run(self):
+        self.process = Popen(self.command, bufsize=1,
+                             stdin=PIPE, stdout=PIPE, stderr=STDOUT)
+        thread = Thread(target=self._queue_output,
+                        args=(self.process.stdout, self.queue))
+        thread.deamon = True
+        thread.start()
+        return self
+
+    def readlines(self, keepends=False):
+        while self.process.poll() is None:
+            try:
+                line = self.queue.get(timeout=0.1)
+                if keepends:
+                    yield line
+                else:
+                    yield line.rstrip('\r\n')
+            except Empty:
+                pass
+
+    def __getattr__(self, name):
+        if self.process:
+            return getattr(self.process, name)
+        raise AttributeError
+
+    def __iter__(self):
+        return self.readlines()
+
+
+
 class FFmpeg(OptionStore):
     """This class represent the FFmpeg command.
 
@@ -68,37 +119,23 @@ class FFmpeg(OptionStore):
 
     def __init__(self, binary="ffmpeg", *args):
         self.binary = binary
+        self.process = None
         OptionStore.__init__(self, *args)
-
-    def run(self):
-        """Execute through subprocess the :attr:`binary` with all Options
-        that are appended in this Store as arguments.
-        """
-        self.pipe = Popen(list(self), stderr=PIPE)
-        fcntl(self.pipe.stderr.fileno(), F_SETFL,
-              fcntl(self.pipe.stderr.fileno(), F_GETFL) | os.O_NONBLOCK)
-        return self
-
-    def wait_for_data(self):
-        """ As long as the :attr:`binary` is executed through :meth:`run`
-        we process a syscall to check if ffmpeg has written to stderr. If
-        ffmpeg has written to stderr we return true. If the binary isn't
-        running any more we return False.
-
-        This is a helper class to deal with the unbuffered output from ffmpeg
-        """
-        while self.pipe.poll() is None:
-            ready = select([self.pipe.stderr.fileno()], [], [])[0]
-            if ready:
-                return True
-        return False
-
-    def poll(self):
-        """Check if :attr:`binary` is running"""
-        return self.pipe.poll()
 
     def add_option(self, key, value):
         self._list.insert(0, Option({key: value}))
+
+    def run(self):
+        return FFmpegProcess(self).run()
+
+    def __enter__(self):
+        self.process = self.run()
+        return self.process
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        if self.process.poll() is None:
+            self.process.terminate()
+        self.process = None
 
     def __iter__(self):
         return chain([self.binary], OptionStore.__iter__(self))
