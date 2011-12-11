@@ -81,7 +81,7 @@ class FFmpegProcess(object):
                 line = ''
         out.close()
 
-    def run(self):
+    def run(self, daemon=True):
         """Executes the command. A thread will be started to collect
         the outputs (stderr and stdout) from that command.
         The outputs will be written to the queue.
@@ -92,7 +92,7 @@ class FFmpegProcess(object):
                              stdin=PIPE, stdout=PIPE, stderr=STDOUT)
         thread = Thread(target=self._queue_output,
                         args=(self.process.stdout, self.queue))
-        thread.deamon = True
+        thread.deamon = daemon
         thread.start()
         return self
 
