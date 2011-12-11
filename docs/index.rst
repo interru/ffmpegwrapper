@@ -34,6 +34,9 @@ API
 .. autoclass:: FFmpeg
     :members:
 
+.. autoclass:: ffmpegwrapper.ffmpeg.FFmpegProcess
+    :members:
+
 Input/Output
 ~~~~~~~~~~~~
 

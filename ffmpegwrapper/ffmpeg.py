@@ -57,6 +57,10 @@ class Output(OptionStore):
 
 
 class FFmpegProcess(object):
+    """Class to exectute FFmpeg.
+
+    :param command: a sequence of the binary and it arguments
+    """
 
     def __init__(self, command):
         self.command = list(command)
@@ -64,6 +68,8 @@ class FFmpegProcess(object):
         self.process = None
 
     def _queue_output(self, out, queue):
+        """Read the output from the command bytewise. On every newline
+        the line is put to the queue."""
         line = ''
         while self.process.poll() is None:
             chunk = out.read(1).decode('utf-8')
@@ -76,6 +82,12 @@ class FFmpegProcess(object):
         out.close()
 
     def run(self):
+        """Executes the command. A thread will be started to collect
+        the outputs (stderr and stdout) from that command.
+        The outputs will be written to the queue.
+
+        :return: self
+        """
         self.process = Popen(self.command, bufsize=1,
                              stdin=PIPE, stdout=PIPE, stderr=STDOUT)
         thread = Thread(target=self._queue_output,
@@ -85,6 +97,12 @@ class FFmpegProcess(object):
         return self
 
     def readlines(self, keepends=False):
+        """Yield lines from the queue that were collected from the
+        command. You can specify if you want to keep newlines at the ends.
+        Default is to drop them.
+
+        :param keepends: keep the newlines at the end. Default=False
+        """
         while self.process.poll() is None:
             try:
                 line = self.queue.get(timeout=0.1)
@@ -108,7 +126,7 @@ class FFmpegProcess(object):
 class FFmpeg(OptionStore):
     """This class represent the FFmpeg command.
 
-    It behaves like a list. If you iterate over the class it will yield
+    It behaves like a list. If you iterate over the object it will yield
     small parts from the ffmpeg command with it arguments. The arguments
     for the command are in the Option classes. They can be appended directly
     or through one or more Stores.
@@ -126,6 +144,12 @@ class FFmpeg(OptionStore):
         self._list.insert(0, Option({key: value}))
 
     def run(self):
+        """Executes the command of this object. Return a
+        :class:`FFmpegProcess` object which have already the
+        :meth:`FFmpegProcess.run` invoked.
+
+        :return: :class:`FFmpegProcess` object with `run()` invoked
+        """
         return FFmpegProcess(self).run()
 
     def __enter__(self):
