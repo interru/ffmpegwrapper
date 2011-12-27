@@ -31,8 +31,7 @@ class VideoFilter(FilterStore):
     """
 
     def blackframe(self, amount, threshold):
-        filter = self._format_parameter(amount, threshold)
-        self.add_option('blackframe', filter)
+        self.add_parameter('blackframe', amount, threshold)
         return self
 
     def copy(self):
@@ -40,35 +39,30 @@ class VideoFilter(FilterStore):
         return self
 
     def crop(self, out_w, out_h=None, x=None, y=None):
-        filter = self._format_parameter(out_w, out_h, x, y)
-        self.add_option('crop', filter)
+        self.add_parameter('crop', out_w, out_h, x, y)
         return self
 
     def cropdetect(self, limit=None, round=None, reset=None):
-        filter = self._format_parameter(limit, round, reset)
-        self.add_option('cropdetect', filter)
+        self.add_parameter('cropdetect', limit, round, reset)
         return self
 
     def drawbox(self, x, y, width, height, color):
-        filter = self._format_parameter(x, y, width, height, color)
-        self.add_option('drawbox', filter)
+        self.add_parameter('drawbox', x, y, width, height, color)
         return self
 
     def drawtext(self, **kwargs):
-        filter = self._format_keyword_parameter(**kwargs)
-        self.add_option('drawtext', filter)
+        self.add_parameter('drawtext', **kwargs)
         return self
 
     def fade(self, type, start, number):
-        filter = self._format_parameter(type, start, number)
-        self.add_option('fade', filter)
+        self.add_parameter('fade', type, start, number)
         return self
 
     def fieldorder(self, type):
         if str(type) not in ['0', '1', 'bff', 'tff']:
             raise ValueError('Invalid Option for fieldorder. '
                              'Read FFmpeg manual!')
-        self.add_option('fieldorder', type)
+        self.add_parameter('fieldorder', type)
         return self
 
     def fifo(self):
@@ -76,18 +70,15 @@ class VideoFilter(FilterStore):
         return self
 
     def format(self, *args):
-        filter = self._format_parameter(*args)
-        self.add_option('format', filter)
+        self.add_parameter('format', *args)
         return self
 
     def freior(self, name, *args):
-        filter = self._format_parameter(name, *args)
-        self.add_option('frei0r', filter)
+        self.add_parameter('frei0r', name, *args)
         return self
 
     def gradfun(self, strength='', radius=''):
-        filter = self._format_parameter(strength, radius)
-        self.add_option('gradfun', filter)
+        self.add_parameter('gradfun', strength, radius)
         return self
 
     def hflip(self):
@@ -96,14 +87,12 @@ class VideoFilter(FilterStore):
 
     def hqdn3d(self, luma_sp=None, chroma_sp=None,
                luma_tmp=None, chroma_tmp=None):
-        filter = self._format_parameter(
+        self.add_parameter('hqdn3d',
             luma_sp, chroma_sp, luma_tmp, chroma_tmp)
-        self.add_option('hqdn3d', filter)
         return self
 
     def mp(self, **kwargs):
-        filter = self._format_keyword_parameter(**kwargs)
-        self.add_option('mp', filter)
+        self.add_parameter('mp', **kwargs)
         return self
 
     def negate(self):
@@ -111,8 +100,7 @@ class VideoFilter(FilterStore):
         return self
 
     def noformat(self, *args):
-        filter = self._format_parameter(*args)
-        self.add_option('noformat', filter)
+        self.add_parameter('noformat', *args)
         return self
 
     def null(self):
@@ -120,55 +108,49 @@ class VideoFilter(FilterStore):
         return self
 
     def overlay(self, x, y):
-        filter = self._format_parameter(x, y)
-        self.add_option('overlay', filter)
+        self.add_parameter('overlay', x, y)
         return self
 
     def pad(self, width, height, x, y, color):
-        filter = self._format_parameter(width, height, x, y, color)
-        self.add_option('pad', filter)
+        self.add_parameter('pad', width, height, x, y, color)
         return self
 
     def scale(self, width=-1, height=-1):
-        filter = self._format_parameter(width, height)
-        self.add_option('scale', filter)
+        self.add_parameter('scale', width, height)
         return self
 
     def select(self, expression):
-        self.add_option('select', expression)
+        self.add_parameter('select', expression)
         return self
 
     def setdar(self, x, y):
-        filter = self._format_parameter(x, y)
-        self.add_option('setdar', filter)
+        self.add_parameter('setdar', x, y)
         return self
 
     def setpts(self, expression):
-        self.add_option('setpts', expression)
+        self.add_parameter('setpts', expression)
         return self
 
     def setsar(self, x, y):
-        filter = self._format_parameter(x, y)
-        self.add_option('setsar', filter)
+        self.add_parameter('setsar', x, y)
         return self
 
     def slicify(self, height=16):
-        self.add_option("slicify", height)
+        self.add_parameter('slicify', height)
         return self
 
     def transpose(self, type):
         if str(type) not in ['0', '1','2', '3']:
             raise ValueError('Invalid Option for transpose. '
                              'Read FFmpeg manual')
-        self.add_option('transpose', type)
+        self.add_parameter('transpose', type)
         return self
 
     def unsharp(self, *args):
         if len(args) > 6:
             message = 'unsharp() takes exactly 6 positional arguments'
             raise TypeError(message)
-        filter = self._format_parameter(*args)
-        self.add_option('unsharp', filter)
+        self.add_parameter('unsharp', *args)
         return self
 
     def vflip(self):
@@ -176,8 +158,7 @@ class VideoFilter(FilterStore):
         return self
 
     def yadif(self, mode=0, parity=-1):
-        filter = self._format_parameter(mode, parity)
-        self.add_option('yadif', filter)
+        self.add_parameter('yadif', mode, parity)
         return self
 
     def __iter__(self):

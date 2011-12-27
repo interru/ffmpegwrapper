@@ -14,26 +14,26 @@ class FFmpegTestCase(unittest.TestCase):
         self.assertEqual(list(input), ['-i', '/old'])
         self.assertEqual(input.file, '/old')
 
-        option = Option({'-vf': 'x11grab'})
+        option = Option('-vf', 'x11grab')
         input.append(option)
         self.assertEqual(list(input), ['-vf', 'x11grab', '-i', '/old'])
         self.assertEqual(input.pop(), option)
 
         input.add_option('-vf', 'x11grab')
-        self.assertEqual(input.option_containers, [option])
+        self.assertEqual(input.container_list, [option])
 
     def test_output_interface(self):
         output = Output('/new')
         self.assertEqual(list(output), ['/new'])
         self.assertEqual(output.file, '/new')
 
-        option = Option({'-vcodec': 'libx264'})
+        option = Option('-vcodec', 'libx264')
         output.append(option)
         self.assertEqual(list(output), ['-vcodec', 'libx264', '/new'])
         self.assertEqual(output.pop(), option)
 
         output.add_option('-vcodec', 'libx264')
-        self.assertEqual(output.option_containers, [option])
+        self.assertEqual(output.container_list, [option])
 
     def test_codec_interface(self):
         codec = VideoCodec('libx264')

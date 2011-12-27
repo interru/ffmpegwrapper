@@ -141,7 +141,7 @@ class FFmpeg(OptionStore):
         OptionStore.__init__(self, *args)
 
     def add_option(self, key, value):
-        self._list.insert(0, Option({key: value}))
+        self.container_list.insert(0, Option(key, value))
 
     def run(self):
         """Executes the command of this object. Return a

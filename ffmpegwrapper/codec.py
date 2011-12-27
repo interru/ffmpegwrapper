@@ -40,8 +40,7 @@ class VideoCodec(Codec):
         return self
 
     def aspect(self, x, y):
-        filter = self._format_parameter(x, y)
-        self.add_option('-aspect', filter)
+        self.add_parameter('-aspect', x, y)
         return self
 
     def bitrate_tolerance(self, tolerance):

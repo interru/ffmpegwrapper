@@ -1,91 +1,73 @@
 # -*- coding: utf-8 -*-
 
+from itertools import chain
+from collections import MutableSequence, namedtuple
 
-class Option(dict):
-
-    def __init__(self, *args, **kwargs):
-        dict.__init__(self, *args, **kwargs)
-
-    def __getitem__(self, key):
-        if key in self:
-            return dict.__getitem__(self, key)
-
-    def __iter__(self):
-        for option, value in self.items():
-            yield option
-            if value:
-                yield value
-
-    def iteritems(self):
-        for option, value in self.items():
-            yield (option, value)
-
-    def __repr__(self):
-        return "<{cls} {opts}>".format(opts=list(self),
-            cls=self.__class__.__name__)
+try:
+    from itertools import ifilter
+except ImportError:
+    ifilter = filter
 
 
-class OptionStore(object):
+def format_parameter(*args, **kwargs):
+    parameter_list = []
+    for key, value in kwargs.items():
+        try:
+            if not value:
+                parameter_list.append(key)
+            else:
+                parameter_list.append("=".join([key, value]))
+        except TypeError:
+            values = ':'.join(kwargs[key])
+            parameter_list.append("=".join([key, values]))
+    for value in args:
+        if value is not None:
+            parameter_list.append(str(value))
+    result = ':'.join(parameter_list)
+    if kwargs:
+        return '"%s"' % result
+    return result
 
-    def __init__(self, *args):
-        self._list = list(args)
 
-    def __add__(self, other):
-        self.append(other)
+Option = namedtuple('Option', ['name', 'value'])
 
-    def append(self, item):
-        self._list.append(item)
 
-    def insert(self, item):
-        self._list.insert(item)
+class OptionStore(MutableSequence):
 
-    def pop(self):
-        return self._list.pop()
-
-    def remove(self, item):
-        self._list.remove()
-
-    def count(self, items):
-        return self._list.count()
-
-    def index(self, item):
-        return self._list.index(item)
+    def __init__(self, *containers):
+        self.container_list = list(containers)
 
     def add_option(self, key, value):
-        self._list.append(Option({key: value}))
+        self.container_list.append(Option(key, value))
 
-    @property
-    def option_containers(self):
-        return self._list
+    def add_parameter(self, name, *args, **kwargs):
+        parameter = format_parameter(*args, **kwargs)
+        self.add_option(name, parameter)
 
-    def __iter__(self):
-        for option in self._list:
-            for item in option:
-                yield item
+    def insert(self, index, value):
+        self.container_list.insert(index, value)
 
     def iteritems(self):
-        for option in self._list:
-            for item in option.iteritems():
-                yield item
+        return iter(self.container_list)
 
-    def _format_parameter(self, *args):
-        parameter = filter(lambda x: x is not None, args)
-        return ':'.join(map(str, parameter))
+    def __iter__(self):
+        return ifilter(None, chain.from_iterable(self.container_list))
 
-    def _format_keyword_parameter(self, **kwargs):
-        parameter_list = []
-        print(kwargs)
-        for key, value in kwargs.items():
-            try:
-                if not value:
-                    parameter_list.append(key)
-                else:
-                    parameter_list.append("=".join([key, value]))
-            except TypeError:
-                values = ':'.join(kwargs[key])
-                parameter_list.append("=".join([key, values]))
-        return '"' + ':'.join(parameter_list) + '"'
+    def __len__(self):
+        return self.container_list.__len__()
+
+    def __setitem__(self, index, value):
+        self.container_list.__setitem__(index, value)
+
+    def __getitem__(self, index):
+        return self.container_list.__getitem__(index)
+
+    def __delitem__(self, index):
+        self.container_list.__delitem__(index)
+
+    def __contains__(self, other):
+        return self.container_list.__contains__(other)
 
     def __repr__(self):
-        return "<{cls} {opts}>".format(opts=list(self),
-            cls=self.__class__.__name__)
+        return "<{cls} {opts}>".format(
+            opts=list(self), cls=self.__class__.__name__)
