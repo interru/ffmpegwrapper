@@ -18,6 +18,7 @@ resulting command.
 
 """
 
+import sys
 from setuptools import setup
 
 
@@ -32,6 +33,8 @@ setup(
     keywords='Video Convert Ffmpeg',
     long_description=__doc__,
     license="BSD",
+    test_suite='test',
+    tests_require='mock>=0.7.2',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
