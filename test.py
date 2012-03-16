@@ -6,7 +6,7 @@ from mock import patch
 
 from ffmpegwrapper import FFmpeg, Input, Output, \
     VideoCodec, AudioCodec, VideoFilter
-from ffmpegwrapper.options import Option
+from ffmpegwrapper.parameters import Parameter
 
 
 class FFmpegTestCase(unittest.TestCase):
@@ -31,28 +31,28 @@ class FFmpegTestCase(unittest.TestCase):
     def test_input_interface(self):
         input = Input('/old')
         self.assertEqual(list(input), ['-i', '/old'])
-        self.assertEqual(input.file, '/old')
+        self.assertEqual(input.file_path, '/old')
 
-        option = Option('-vf', 'x11grab')
-        input.append(option)
+        parameter = Parameter('-vf', 'x11grab')
+        input.append(parameter)
         self.assertEqual(list(input), ['-vf', 'x11grab', '-i', '/old'])
-        self.assertEqual(input.pop(), option)
+        self.assertEqual(input.pop(), parameter)
 
-        input.add_option('-vf', 'x11grab')
-        self.assertEqual(input.container_list, [option])
+        input.add_formatparam('-vf', 'x11grab')
+        self.assertEqual(input.container_list, [parameter])
 
     def test_output_interface(self):
         output = Output('/new')
         self.assertEqual(list(output), ['/new'])
-        self.assertEqual(output.file, '/new')
+        self.assertEqual(output.file_path, '/new')
 
-        option = Option('-vcodec', 'libx264')
-        output.append(option)
+        parameter = Parameter('-vcodec', 'libx264')
+        output.append(parameter)
         self.assertEqual(list(output), ['-vcodec', 'libx264', '/new'])
-        self.assertEqual(output.pop(), option)
+        self.assertEqual(output.pop(), parameter)
 
-        output.add_option('-vcodec', 'libx264')
-        self.assertEqual(output.container_list, [option])
+        output.add_formatparam('-vcodec', 'libx264')
+        self.assertEqual(output.container_list, [parameter])
 
     def test_codec_interface(self):
         codec = VideoCodec('libx264')

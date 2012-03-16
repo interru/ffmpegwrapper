@@ -5,7 +5,7 @@ FFmpegwrapper
 ~~~~~~~~~~~~~
 
 FFmpegWrapper is a small wrapper for the ffmpeg encoder. You can append
-Codec, Filters and other OptionStores to the FFmpeg class and then run the
+Codec, Filters and other ParameterStores to the FFmpeg class and then run the
 resulting command.
 
 >>> from ffmpegwrapper import FFmpeg, Input, Output, VideoCodec, VideoFilter
@@ -18,9 +18,7 @@ resulting command.
 
 """
 
-import sys
 from setuptools import setup
-
 
 setup(
     name="ffmpegwrapper",

@@ -19,42 +19,43 @@ try:
 except ImportError:
     from queue import Queue, Empty
 
-from .options import OptionStore, Option
+from .parameters import ParameterContainer, Parameter
 
 
-class Input(OptionStore):
-    """Store for a input file.
+class Input(ParameterContainer):
+    """Container for a input file.
 
-    :param file: Path to the input file
-    :param args: A list of Stores that should be appended
+    :param file_path: Path to the input file
+    :param args: A list of Containers that should be appended
     """
 
-    def __init__(self, file, *args):
-        self.file = file
-        OptionStore.__init__(self, *args)
+    def __init__(self, file_path, *args):
+        self.file_path = file_path
+        ParameterContainer.__init__(self, *args)
 
     def __iter__(self):
-        return chain(OptionStore.__iter__(self), ['-i', self.file])
+        return chain(ParameterContainer.__iter__(self),
+                     ['-i', self.file_path])
 
 
-class Output(OptionStore):
-    """Store for a output file.
+class Output(ParameterContainer):
+    """Container for a output file.
 
-    :param file: Path in which the file should be saved
-    :param args: A list of Stores that should be appended
+    :param file_path: Path in which the file should be saved
+    :param args: A list of Containers that should be appended
     """
 
-    def __init__(self, file, *args):
-        self.file = file
-        OptionStore.__init__(self, *args)
+    def __init__(self, file_path, *args):
+        self.file_path = file_path
+        ParameterContainer.__init__(self, *args)
 
     def overwrite(self):
         """Overwrite the file if it already exist"""
-        self.add_option('-y', None)
+        self.add_parameter('-y', None)
         return self
 
     def __iter__(self):
-        return chain(OptionStore.__iter__(self), [self.file])
+        return chain(ParameterContainer.__iter__(self), [self.file_path])
 
 
 class FFmpegProcess(object):
@@ -65,7 +66,7 @@ class FFmpegProcess(object):
 
     def __init__(self, command):
         self.command = list(command)
-        self.queue = Queue()
+        self.queue = Queue(maxsize=2000)
         self.process = None
 
     def _queue_output(self, out, queue):
@@ -127,26 +128,25 @@ class FFmpegProcess(object):
         return self.readlines()
 
 
-
-class FFmpeg(OptionStore):
+class FFmpeg(ParameterContainer):
     """This class represent the FFmpeg command.
 
     It behaves like a list. If you iterate over the object it will yield
     small parts from the ffmpeg command with it arguments. The arguments
-    for the command are in the Option classes. They can be appended directly
-    or through one or more Stores.
+    for the command are in the Parameter classes. They can be appended
+    directly or through one or more Containers.
 
     :param binary: The binary subprocess should execute at the :meth:`run`
-    :param args: A list of Stores that should be appended
+    :param args: A list of Containers that should be appended
     """
 
     def __init__(self, binary="ffmpeg", *args):
         self.binary = binary
         self.process = None
-        OptionStore.__init__(self, *args)
+        ParameterContainer.__init__(self, *args)
 
-    def add_option(self, key, value):
-        self.container_list.insert(0, Option(key, value))
+    def add_parameter(self, key, value):
+        self.container_list.insert(0, Parameter(key, value))
 
     def run(self):
         """Executes the command of this object. Return a
@@ -167,4 +167,4 @@ class FFmpeg(OptionStore):
         self.process = None
 
     def __iter__(self):
-        return chain([self.binary], OptionStore.__iter__(self))
+        return chain([self.binary], ParameterContainer.__iter__(self))
