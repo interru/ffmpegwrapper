@@ -12,25 +12,21 @@ from ffmpegwrapper.options import Option
 class FFmpegTestCase(unittest.TestCase):
 
     def setUp(self):
-        patcher = patch('ffmpegwrapper.ffmpeg.Popen')
-        popen = patcher.start()
+        self.patcher = patch('ffmpegwrapper.ffmpeg.Popen')
+        popen = self.patcher.start()
         self.instance = popen.return_value
 
-        poll_values = [None] * 80
-        def poll(*args):
-            if len(poll_values) < 1:
-                return 0
-            poll_values.pop(0)
-        self.instance.poll.side_effect = poll
-
         read_value = list('this is a line\nthis too\n')
-        def read(*args):
-            if len(read_value) > 0:
-                return read_value.pop(0).encode('utf-8')
-            return ''.encode('utf-8')
-        self.instance.stdout.read.side_effect = read
+        poll = lambda: None if read_value else 0
 
-        self.addCleanup(patcher.stop)
+        def read(*args):
+            try:
+                return read_value.pop(0).encode('utf-8')
+            except IndexError:
+                return ''.encode('utf-8')
+
+        self.instance.poll.side_effect = poll
+        self.instance.stdout.read.side_effect = read
 
     def test_input_interface(self):
         input = Input('/old')
@@ -83,9 +79,10 @@ class FFmpegTestCase(unittest.TestCase):
 
         with ffmpeg as process:
             result = list(process.readlines())
-            self.assertEqual(result[0], 'this is a line')
-            self.assertEqual(result[1], 'this too')
-            self.assertEqual(len(result), 2)
+            self.assertEqual(result, ['this is a line', 'this too'])
+
+    def tearDown(self):
+        self.patcher.stop()
 
 
 class VideoFilterTestCase(unittest.TestCase):

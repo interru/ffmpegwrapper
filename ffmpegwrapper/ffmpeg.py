@@ -72,13 +72,16 @@ class FFmpegProcess(object):
         """Read the output from the command bytewise. On every newline
         the line is put to the queue."""
         line = ''
-        while self.process.poll() is None:
+        running = self.process.poll() is None
+
+        while running:
             chunk = out.read(1).decode('utf-8')
             if chunk == '':
+                running = self.process.poll() is None
                 continue
             line += chunk
             if chunk in ('\n', '\r'):
-                queue.put(line)
+                queue.put(line, timeout=0.4)
                 line = ''
         out.close()
 
@@ -104,15 +107,16 @@ class FFmpegProcess(object):
 
         :param keepends: keep the newlines at the end. Default=False
         """
-        while self.process.poll() is None:
+        running = self.process.poll() is None
+        while running or self.queue.qsize():
             try:
-                line = self.queue.get(timeout=0.1)
+                line = self.queue.get(timeout=0.05)
                 if keepends:
                     yield line
                 else:
                     yield line.rstrip('\r\n')
             except Empty:
-                pass
+                running = self.process.poll() is None
 
     def __getattr__(self, name):
         if self.process:
