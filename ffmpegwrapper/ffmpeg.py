@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-    FFmpeg
+    ffmpegwrapper.ffmpeg
+    ~~~~~~~~~~~~~~~~~~~~
 
     Your entrypoint for every Task you want to do with FFmpeg
 

@@ -1,4 +1,13 @@
 # -*- coding: utf8 -*-
+"""
+    ffmpegwrapper.filter
+    ~~~~~~~~~~~~~~~~~~~~
+
+    This module provides filter methods for video and audio.
+
+    :copyright: (c) 2012 by Mathias Koehler.
+    :license: BSD, see LICENSE for more details.
+"""
 
 from itertools import chain
 
