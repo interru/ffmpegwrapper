@@ -3,6 +3,7 @@ docs/_build
 build
 dist
 *.egg-info
+*.egg
 *.pyc
 *.pyo
 *~
