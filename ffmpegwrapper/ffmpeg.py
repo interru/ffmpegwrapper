@@ -23,7 +23,7 @@ from .parameters import ParameterContainer, Parameter
 
 
 class Input(ParameterContainer):
-    """Container for a input file.
+    """Container for an input file.
 
     :param file_path: Path to the input file
     :param args: A list of Containers that should be appended
@@ -39,7 +39,7 @@ class Input(ParameterContainer):
 
 
 class Output(ParameterContainer):
-    """Container for a output file.
+    """Container for an output file.
 
     :param file_path: Path in which the file should be saved
     :param args: A list of Containers that should be appended
@@ -129,7 +129,7 @@ class FFmpegProcess(object):
 
 
 class FFmpeg(ParameterContainer):
-    """This class represent the FFmpeg command.
+    """This class represents the FFmpeg command.
 
     It behaves like a list. If you iterate over the object it will yield
     small parts from the ffmpeg command with it arguments. The arguments
@@ -149,7 +149,7 @@ class FFmpeg(ParameterContainer):
         self.container_list.insert(0, Parameter(key, value))
 
     def run(self):
-        """Executes the command of this object. Return a
+        """Executes the command of this object. Returns a
         :class:`FFmpegProcess` object which have already the
         :meth:`FFmpegProcess.run` invoked.
 
