@@ -21,16 +21,16 @@ resulting command.
 from setuptools import setup
 
 setup(
-    name="ffmpegwrapper",
-    version="0.1-dev",
+    name='ffmpegwrapper',
+    version='0.1-dev',
     packages=['ffmpegwrapper'],
-    author="Mathias Koehler",
-    author_email="mail@mathias.im",
-    url="http://github.com/interrupted/ffmpegwrapper",
+    author='Mathias Koehler',
+    author_email='mail@mathias.im',
+    url='http://github.com/interrupted/ffmpegwrapper',
     description='A simple wrapper for ffmpeg-cli',
     keywords='Video Convert Ffmpeg',
     long_description=__doc__,
-    license="BSD",
+    license='BSD',
     test_suite='test',
     tests_require='mock>=0.7.2',
     classifiers=[

@@ -119,7 +119,7 @@ class VideoFilterTestCase(unittest.TestCase):
             self.prefix('drawbox=10:10:10:10:red'))
 
     def test_drawtext(self):
-        self.filter.drawtext(fontfile="./font.ttf", text="Title")
+        self.filter.drawtext(fontfile='./font.ttf', text='Title')
         self.assertEqual(list(self.filter),
             self.prefix('drawtext="fontfile=./font.ttf:text=Title"'))
 

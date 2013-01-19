@@ -140,7 +140,7 @@ class FFmpeg(ParameterContainer):
     :param args: A list of Containers that should be appended
     """
 
-    def __init__(self, binary="ffmpeg", *args):
+    def __init__(self, binary='ffmaeg', *args):
         self.binary = binary
         self.process = None
         ParameterContainer.__init__(self, *args)
