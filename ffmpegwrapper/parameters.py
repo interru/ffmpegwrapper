@@ -6,7 +6,7 @@
     Implements a basic structure for commandline
     arguments and some helpers to operate with them.
 
-    :copyright: (c) 2012 by Mathias Koehler.
+    :copyright: (c) 2013 by Mathias Koehler.
     :license: BSD, see LICENSE for more details.
 """
 from itertools import chain

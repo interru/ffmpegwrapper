@@ -5,7 +5,7 @@
 
     Your entrypoint for every Task you want to do with FFmpeg
 
-    :copyright: (c) 2012 by Mathias Koehler.
+    :copyright: (c) 2013 by Mathias Koehler.
     :license: BSD, see LICENSE for more details.
 """
 
