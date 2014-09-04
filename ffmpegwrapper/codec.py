@@ -46,7 +46,7 @@ class VideoCodec(Codec):
         return self
 
     def size(self, x, y):
-        filter = "{x}x{y}".format(x, y)
+        filter = "{0}x{1}".format(x, y)
         self.add_formatparam('-s', filter)
         return self
 
