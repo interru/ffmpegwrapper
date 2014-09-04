@@ -16,14 +16,14 @@ class FFmpegTestCase(unittest.TestCase):
         popen = self.patcher.start()
         self.instance = popen.return_value
 
-        read_value = list('this is a line\nthis too\n')
+        read_value = bytearray(b'this is a line\nthis too\n')
         poll = lambda: None if read_value else 0
 
         def read(*args):
             try:
-                return read_value.pop(0).encode('utf-8')
+                return bytearray([read_value.pop(0)])
             except IndexError:
-                return ''.encode('utf-8')
+                return b''
 
         self.instance.poll.side_effect = poll
         self.instance.stdout.read.side_effect = read

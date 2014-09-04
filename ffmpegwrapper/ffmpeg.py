@@ -5,7 +5,7 @@
 
     Your entrypoint for every Task you want to do with FFmpeg
 
-    :copyright: (c) 2013 by Mathias Koehler.
+    :copyright: (c) 2014 by Mathias Koehler.
     :license: BSD, see LICENSE for more details.
 """
 
@@ -72,18 +72,18 @@ class FFmpegProcess(object):
     def _queue_output(self, out, queue):
         """Read the output from the command bytewise. On every newline
         the line is put to the queue."""
-        line = ''
-        running = self.process.poll() is None
+        line = bytearray()
+        running = self.running
 
         while running:
-            chunk = out.read(1).decode('utf-8')
-            if chunk == '':
-                running = self.process.poll() is None
+            byte = out.read(1)
+            if byte == b'':
+                running = self.running
                 continue
-            line += chunk
-            if chunk in ('\n', '\r'):
-                queue.put(line, timeout=0.4)
-                line = ''
+            line += byte
+            if byte in (b'\n', b'\r'):
+                queue.put(''.join(line.decode('utf8')), timeout=0.4)
+                line = bytearray()
         out.close()
 
     def run(self, daemon=True):
@@ -100,6 +100,18 @@ class FFmpegProcess(object):
         thread.deamon = daemon
         thread.start()
         return self
+
+    @property
+    def running(self):
+        return self.process.poll() is None
+
+    @property
+    def successful(self):
+        return self.process.returncode == 0
+
+    @property
+    def failed(self):
+        return not (self.successful or self.running)
 
     def readlines(self, keepends=False):
         """Yield lines from the queue that were collected from the
@@ -140,7 +152,7 @@ class FFmpeg(ParameterContainer):
     :param args: A list of Containers that should be appended
     """
 
-    def __init__(self, binary='ffmaeg', *args):
+    def __init__(self, binary='ffmpeg', *args):
         self.binary = binary
         self.process = None
         ParameterContainer.__init__(self, *args)
@@ -168,3 +180,6 @@ class FFmpeg(ParameterContainer):
 
     def __iter__(self):
         return chain([self.binary], ParameterContainer.__iter__(self))
+
+    def __str__(self):
+        return" ".join(self)
