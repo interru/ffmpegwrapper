@@ -55,7 +55,7 @@ class Output(ParameterContainer):
         return self
 
     def __iter__(self):
-        return chain(ParameterContainer.__iter__(self), [self.file_path])
+        return chain(ParameterContainer.__iter__(self), ['--', self.file_path])
 
 
 class FFmpegProcess(object):
